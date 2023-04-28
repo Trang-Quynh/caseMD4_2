@@ -4,31 +4,53 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const userService_1 = __importDefault(require("../service/userService"));
+const bcrypt_1 = __importDefault(require("bcrypt"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const auth_1 = require("../middleware/auth");
 class UserController {
     constructor() {
         this.signup = async (req, res) => {
             let user = req.body;
-            console.log(req.body);
-            let userCheck = await this.userService.checkUserSignup(req.body);
+            let userCheck = await this.userService.checkUser(req.body);
+            console.log(userCheck);
             if (userCheck) {
                 res.status(200).json('Đã có tài khoản');
             }
+            else if (!user.username || !user.password) {
+                res.status(200).json('Dien thieu');
+            }
             else {
+                user.password = await bcrypt_1.default.hash(user.password, 10);
                 let newUser = await this.userService.createNewUser(user);
-                res.status(200).json('Tạo thành công');
+                res.status(201).json(newUser);
             }
         };
         this.login = async (req, res) => {
-            let user = await this.userService.checkUserLogin(req.body);
-            if (!user) {
-                res.status(200).json('Tai khoan khong ton tai');
+            let user = req.body;
+            console.log(user);
+            let userFind = await this.userService.checkUser(user);
+            console.log(userFind);
+            if (!userFind) {
+                res.status(202).json({ message: 'Username is not exits' });
             }
             else {
-                if (user.username === 'admin' && user.password === 'admin') {
-                    res.status(200).json('admin');
+                let comparePassword = await bcrypt_1.default.compare(req.body.password, userFind.password);
+                if (!comparePassword) {
+                    res.status(202).json({
+                        message: 'Password is wrong'
+                    });
                 }
                 else {
-                    res.status(200).json('user');
+                    let payload = {
+                        username: userFind.username
+                    };
+                    let token = jsonwebtoken_1.default.sign(payload, auth_1.SECRET, {
+                        expiresIn: 36000
+                    });
+                    console.log(token);
+                    res.status(200).json({
+                        token: token
+                    });
                 }
             }
         };

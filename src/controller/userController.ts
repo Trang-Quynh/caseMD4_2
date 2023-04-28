@@ -1,5 +1,8 @@
 import {Request, Response} from "express";
 import userService from "../service/userService";
+import bcrypt from 'bcrypt'
+import jwt from 'jsonwebtoken'
+import {SECRET} from '../middleware/auth'
 
 class UserController {
 
@@ -12,32 +15,46 @@ class UserController {
 
     signup = async (req: Request, res: Response) => {
         let user = req.body
-        console.log(req.body)
-        let userCheck = await this.userService.checkUserSignup(req.body)
+        let userCheck = await this.userService.checkUser(req.body)
+        console.log(userCheck)
         if (userCheck) {
             res.status(200).json('Đã có tài khoản')
+        } else if(!user.username || !user.password){
+            res.status(200).json('Dien thieu')
         } else {
+            user.password = await bcrypt.hash(user.password, 10)
             let newUser = await this.userService.createNewUser(user)
-            res.status(200).json('Tạo thành công')
+            res.status(201).json(newUser)
         }
     }
 
-
     login = async (req: Request, res: Response) => {
-        // check user xem da ton tai chua
-        let user = await this.userService.checkUserLogin(req.body);
-        if (!user) {
-            res.status(200).json('Tai khoan khong ton tai')
+        let user = req.body
+        console.log(user)
+        let userFind = await this.userService.checkUser(user);
+        console.log(userFind)
+        if (!userFind) {
+            res.status(202).json({message: 'Username is not exits'})
         } else {
-            // req.session['user'] = user;
-            if(user.username === 'admin' && user.password === 'admin'){
-                res.status(200).json('admin')
+            let comparePassword = await bcrypt.compare(req.body.password, userFind.password);
+            if(!comparePassword){
+                res.status(202).json({
+                    message: 'Password is wrong'
+                })
             }else{
-                res.status(200).json('user')
+                let payload = {
+                    username: userFind.username
+                }
+                let token = jwt.sign(payload, SECRET, {
+                    expiresIn: 36000
+                });
+                console.log(token)
+                res.status(200).json({
+                    token: token
+                })
             }
         }
     }
-
 }
 
 export default new UserController();

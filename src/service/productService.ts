@@ -36,7 +36,8 @@ class ProductService {
     // }
 
     add = async (product) => {
-       await this.productRepository.save(product)
+     let productNew = await this.productRepository.save(product);
+     return productNew
     }
     deleteProduct = async (id) => {
         await this.productRepository.delete({id:id});

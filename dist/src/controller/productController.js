@@ -12,19 +12,12 @@ class ProductController {
             res.status(200).json(listProduct);
         };
         this.addProduct = async (req, res) => {
-            if (!req.body.name) {
-                res.status(400).json({
-                    message: 'name missing'
-                });
-            }
-            else {
-                await this.productService.add(req.body);
-                res.status(201).json({ message: 'OK' });
-            }
+            let productData = req.body;
+            const productNew = await this.productService.add(productData);
+            res.status(200).json(productNew);
         };
         this.deleteProductPost = async (req, res) => {
             let id = req.body.idDelete;
-            console.log(req.body);
             await this.productService.deleteProduct(id);
             res.status(200).json({ message: 'delete success' });
         };
@@ -35,9 +28,7 @@ class ProductController {
         };
         this.updateProduct = async (req, res) => {
             let id = req.params.id;
-            console.log(id);
             let updateProduct = req.body;
-            console.log(req.body);
             await this.productService.updateProductById(id, updateProduct);
             res.status(200).json({ message: 'update success' });
         };

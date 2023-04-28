@@ -13,7 +13,8 @@ class ProductService {
             return products;
         };
         this.add = async (product) => {
-            await this.productRepository.save(product);
+            let productNew = await this.productRepository.save(product);
+            return productNew;
         };
         this.deleteProduct = async (id) => {
             await this.productRepository.delete({ id: id });

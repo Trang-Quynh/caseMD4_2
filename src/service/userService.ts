@@ -1,5 +1,6 @@
 import {User} from "../entity/user";
 import {AppDataSource} from "../data-source";
+import bcrypt from "bcrypt";
 
 
 class UserService {
@@ -11,25 +12,21 @@ class UserService {
 
 
 
-    checkUserLogin = async (user) => {
-        let userFind = await this.userRepository.findOneBy({
-            username: user.username,
-            password: user.password
-        })
-        return userFind;
-    }
 
     createNewUser = async(user) =>{
         let newUser = await this.userRepository.save(user)
         return newUser
     }
-    checkUserSignup = async (user) => {
-        let userFind = await this.userRepository.findOneBy({
-            username: user.username
-        })
-        console.log(userFind)
+    checkUser = async (user) => {
+        let userFind = await this.userRepository.findOne({
+            where: {
+                username: user.username,
+                // password: user.password
+            }
+        });
         return userFind;
     }
+
 
 
 

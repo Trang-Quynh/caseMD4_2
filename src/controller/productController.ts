@@ -16,36 +16,38 @@ class ProductController {
             res.status(200).json(listProduct)
     }
 
-    addProduct = async (req: Request, res: Response) => {
-        if(!req.body.name){
-            res.status(400).json({
-                message: 'name missing'
-            })
-        }else{
-            await this.productService.add(req.body);
-            res.status(201).json({message:'OK'})
-        }
+    // addProduct = async (req: Request, res: Response) => {
+    //     if(!req.body.name){
+    //         res.status(400).json({
+    //             message: 'name missing'
+    //         })
+    //     }else{
+    //         await this.productService.add(req.body);
+    //         res.status(201).json({message:'OK'})
+    //     }
+    // }
+
+    addProduct  = async (req: Request, res: Response) => {
+      let productData = req.body;
+      const productNew = await this.productService.add(productData);
+      res.status(200).json(productNew)
     }
 
     deleteProductPost  = async (req: Request, res: Response) => {
         let id = req.body.idDelete
-        console.log(req.body)
         await this.productService.deleteProduct(id);
         res.status(200).json({message: 'delete success'})
     }
     showFormUpdate = async (req: Request, res: Response) => {
         let id = req.params.id
         let product = await this.productService.findProductById(id);
-        // console.log(product)
         res.status(200).json(product)
     }
 
 
     updateProduct = async (req: Request, res: Response) => {
         let id = req.params.id
-        console.log(id)
         let updateProduct = req.body
-        console.log(req.body)
         await this.productService.updateProductById(id, updateProduct)
         res.status(200).json({message: 'update success'})
     }
