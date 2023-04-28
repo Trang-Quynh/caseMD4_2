@@ -44,9 +44,9 @@ class UserController {
                     let token = jsonwebtoken_1.default.sign(payload, auth_1.SECRET, {
                         expiresIn: 36000
                     });
-                    console.log(token);
                     res.status(200).json({
-                        token: token
+                        token: token,
+                        role: userFind.role
                     });
                 }
             }

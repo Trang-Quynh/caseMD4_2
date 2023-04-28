@@ -45,9 +45,9 @@ class UserController {
                 let token = jwt.sign(payload, SECRET, {
                     expiresIn: 36000
                 });
-                console.log(token)
                 res.status(200).json({
-                    token: token
+                    token: token,
+                    role: userFind.role
                 })
             }
         }
