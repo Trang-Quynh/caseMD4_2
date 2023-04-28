@@ -16,7 +16,6 @@ class UserController {
     signup = async (req: Request, res: Response) => {
         let user = req.body
         let userCheck = await this.userService.checkUser(req.body)
-        console.log(userCheck)
         if (userCheck) {
             res.status(200).json('Đã có tài khoản')
         } else if(!user.username || !user.password){
@@ -34,13 +33,11 @@ class UserController {
         let userFind = await this.userService.checkUser(user);
         console.log(userFind)
         if (!userFind) {
-            res.status(202).json({message: 'Username is not exits'})
-        } else {
+            res.status(201).json('Username is not exits')
+        }else{
             let comparePassword = await bcrypt.compare(req.body.password, userFind.password);
             if(!comparePassword){
-                res.status(202).json({
-                    message: 'Password is wrong'
-                })
+                res.status(201).json('Password is wrong')
             }else{
                 let payload = {
                     username: userFind.username
